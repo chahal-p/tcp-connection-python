@@ -34,7 +34,7 @@ class TCPConnection():
     if len(data) != le:
       raise ValueError('Complete data did not arrive, missing bytes %s' % (le - len(data)))
     return data
-  
+
   def send(self, data: bytes):
     le = len(data)
     if le > self.MAX_DATA_SIZE:
