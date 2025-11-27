@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 
-import io
-import socket
-import threading
+from io import BytesIO as _BytesIO
+from socket import socket as _Socket, MSG_WAITALL as _flag_MSG_WAITALL
+from threading import Lock as _Lock
 
 class TCPConnection():
   LENGTH_PREFIX = 4
   MAX_DATA_SIZE = 0xffffff
 
-  _sock: socket.socket
-  def __init__(self, sock: socket.socket):
+  _sock: _Socket
+  def __init__(self, sock: _Socket):
     self._sock = sock
-    self._send_lock = threading.Lock()
-    self._recv_lock = threading.Lock()
+    self._send_lock = _Lock()
+    self._recv_lock = _Lock()
 
   def _recv(self, size):
-    with io.BytesIO() as buf:
+    with _BytesIO() as buf:
       with self._recv_lock:
         while size > 0:
-          data = self._sock.recv(size, socket.MSG_WAITALL)
+          data = self._sock.recv(size, _flag_MSG_WAITALL)
           if data:
             buf.write(data)
             size -= len(data)
