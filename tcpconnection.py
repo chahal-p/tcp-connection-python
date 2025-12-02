@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from io import BytesIO as _BytesIO
 from socket import socket as _Socket, MSG_WAITALL as _flag_MSG_WAITALL
 from threading import Lock as _Lock
@@ -18,7 +16,13 @@ class TCPConnection():
     with _BytesIO() as buf:
       with self._recv_lock:
         while size > 0:
-          data = self._sock.recv(size, _flag_MSG_WAITALL)
+          try:
+            data = self._sock.recv(size, _flag_MSG_WAITALL)
+          except OSError as e:
+            if e.errno == 9:
+              raise ConnectionClosedError()
+            else:
+              raise
           if data:
             buf.write(data)
             size -= len(data)
